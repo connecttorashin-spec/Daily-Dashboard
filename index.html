@@ -8,56 +8,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-    --bg: #f5f7fb;
-    --card: #ffffff;
-    --text: #1a1a1a;
-    --muted: #6b7280;
-    --green: #16a34a;
-    --red: #dc2626;
-}
-
-body.dark {
-    --bg: #0b1220;
-    --card: #111827;
-    --text: #f3f4f6;
-    --muted: #9ca3af;
-}
-
 body {
     margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    font-family: Arial, sans-serif;
+    background: #0b1220;
+    color: #f5f7fb;
 }
 
 .container {
     padding: 16px;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 h1 {
     font-size: 20px;
-}
-
-.toggle {
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: var(--card);
-}
-
-.section {
-    margin-top: 20px;
-}
-
-.section h2 {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .grid {
@@ -67,7 +31,7 @@ h1 {
 }
 
 .card {
-    background: var(--card);
+    background: rgba(18,25,45,0.9);
     padding: 12px;
     border-radius: 12px;
 }
@@ -77,12 +41,9 @@ h1 {
     font-weight: bold;
 }
 
-.green { color: var(--green); }
-.red { color: var(--red); }
-
 .link {
     font-size: 12px;
-    color: var(--muted);
+    color: #9ca3af;
     text-decoration: none;
 }
 
@@ -95,86 +56,15 @@ canvas {
 <body>
 <div class="container">
 
-<div class="header">
-    <h1>📊 Daily Market Watch</h1>
-    <div class="toggle" onclick="toggleTheme()">Toggle Theme</div>
-</div>
+<h1>📊 Daily Market Watch</h1>
 
-<!-- Currency -->
-<div class="section">
-<h2>💱 Currency</h2>
-<div class="grid" id="currency"></div>
-</div>
-
-<!-- Commodities -->
-<div class="section">
-<h2>🛢 Commodities</h2>
-<div class="grid" id="commodities"></div>
-</div>
-
-<!-- Market Trend -->
-<div class="section">
-<h2>🏆 Market Trends</h2>
-<div class="grid" id="market"></div>
-</div>
-
-<!-- Equity -->
-<div class="section">
-<h2>📈 Equity (MAG 7)</h2>
-<div class="grid" id="equity"></div>
-</div>
-
-<!-- Watchlist -->
-<div class="section">
-<h2>👀 Watchlist & Events</h2>
-<div class="grid">
-<div class="card">
-<b>Key Events</b>
-<ul>
-<li>US Inflation Data</li>
-<li>Fed Interest Decision</li>
-<li>Oil Supply Updates</li>
-</ul>
-<a class="link" href="https://www.reuters.com" target="_blank">View Source →</a>
-</div>
-
-<div class="card">
-<b>Market News</b>
-<ul>
-<li>Gold volatility rising</li>
-<li>Bitcoin ETF inflows</li>
-<li>Tech earnings ahead</li>
-</ul>
-<a class="link" href="https://www.bloomberg.com" target="_blank">View Source →</a>
-</div>
-</div>
-</div>
+<div class="grid" id="dashboard"></div>
 
 </div>
 
 <script>
 
-function toggleTheme() {
-    document.body.classList.toggle("dark");
-}
-
-// FX DATA
-async function loadFX() {
-    const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=INR,EUR,AED");
-    const data = await res.json();
-
-    const INR = data.rates.INR;
-    const AED = data.rates.AED;
-    const EUR = data.rates.EUR;
-
-    document.getElementById("currency").innerHTML = `
-    ${card("USD → INR", INR.toFixed(2))}
-    ${card("AED → INR", (INR/AED).toFixed(2))}
-    ${card("EUR → INR", (INR/EUR).toFixed(2))}
-    `;
-}
-
-// Dummy chart generator
+// Chart generator (same as before style)
 function chart(id) {
     const ctx = document.getElementById(id).getContext("2d");
     new Chart(ctx, {
@@ -183,17 +73,26 @@ function chart(id) {
             labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
             datasets: [{
                 data: Array.from({length:7},()=>Math.random()*100),
-                borderColor: "#3b82f6",
-                fill:false
+                borderColor: "#4f8cff",
+                tension: 0.4,
+                fill: false
             }]
         },
-        options: {plugins:{legend:{display:false}}}
+        options: {
+            plugins:{legend:{display:false}},
+            scales:{
+                x:{ticks:{color:"#9ca3af"}},
+                y:{ticks:{color:"#9ca3af"}}
+            }
+        }
     });
 }
 
+// Card builder
 function card(name, price) {
     const id = Math.random().toString(36).substring(7);
     setTimeout(()=>chart(id),100);
+
     return `
     <div class="card">
         <div>${name}</div>
@@ -203,29 +102,27 @@ function card(name, price) {
     </div>`;
 }
 
-// Dummy data loaders (replace with APIs if needed)
-function loadStatic() {
-    document.getElementById("commodities").innerHTML =
+// Load data (same structure as your original)
+function load() {
+    const html =
         card("Gold (USD)", 2300) +
         card("Silver (USD)", 28) +
-        card("Oil (USD)", 80);
-
-    document.getElementById("market").innerHTML =
+        card("Oil (USD)", 80) +
+        card("Bitcoin (USD)", 65000) +
         card("Gold Dubai (AED/g)", 280) +
-        card("Gold Kochi (INR/g)", 6500);
-
-    document.getElementById("equity").innerHTML =
+        card("Gold Kochi (INR/g)", 6500) +
         card("AAPL", 190) +
         card("MSFT", 420) +
         card("GOOGL", 160);
+
+    document.getElementById("dashboard").innerHTML = html;
 }
 
-// INIT
-loadFX();
-loadStatic();
+// Init
+load();
 
-// Refresh every 60 sec
-setInterval(loadFX, 60000);
+// Auto refresh
+setInterval(load, 60000);
 
 </script>
 </body>
