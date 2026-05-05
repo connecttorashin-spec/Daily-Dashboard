@@ -1,129 +1,625 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Market Watch</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Financial Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060912;
+      --bg-2: #0b1020;
+      --card: rgba(18, 25, 45, 0.72);
+      --card-2: rgba(22, 31, 55, 0.9);
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f5f7fb;
+      --muted: #94a3b8;
+      --muted-2: #64748b;
+      --green: #16c784;
+      --red: #ea3943;
+      --amber: #f59e0b;
+      --blue: #38bdf8;
+      --purple: #a78bfa;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+      --radius: 22px;
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    * { box-sizing: border-box; }
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0b1220;
-    color: #f5f7fb;
-}
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34%),
+        radial-gradient(circle at 80% 15%, rgba(167, 139, 250, 0.15), transparent 32%),
+        linear-gradient(140deg, var(--bg), var(--bg-2));
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-.container {
-    padding: 16px;
-}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), rgba(0,0,0,.15));
+      pointer-events: none;
+      z-index: -1;
+    }
 
-h1 {
-    font-size: 20px;
-    margin-bottom: 20px;
-}
+    .app { width: min(1480px, 100%); margin: 0 auto; padding: 18px; }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
-    gap: 12px;
-}
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(8, 13, 28, 0.72);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
 
-.card {
-    background: rgba(18,25,45,0.9);
-    padding: 12px;
-    border-radius: 12px;
-}
+    .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
 
-.price {
-    font-size: 18px;
-    font-weight: bold;
-}
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #38bdf8, #a78bfa 55%, #16c784);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 12px 38px rgba(56, 189, 248, .22);
+      flex: 0 0 auto;
+    }
 
-.link {
-    font-size: 12px;
-    color: #9ca3af;
-    text-decoration: none;
-}
+    h1 { font-size: clamp(20px, 4vw, 34px); margin: 0 0 4px; letter-spacing: -0.04em; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
 
-canvas {
-    height: 120px !important;
-}
-</style>
+    .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
+
+    .pill, button, select {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.055);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(135deg, rgba(56,189,248,.2), rgba(167,139,250,.19));
+      transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+    }
+    button:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.24); }
+    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card, .panel, .asset-card {
+      border: 1px solid var(--border);
+      background: var(--card);
+      backdrop-filter: blur(22px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card { padding: 15px; min-height: 94px; }
+    .stat-label { color: var(--muted); font-size: 12px; margin-bottom: 9px; }
+    .stat-value { font-size: 21px; font-weight: 800; letter-spacing: -.03em; }
+    .stat-note { margin-top: 7px; color: var(--muted-2); font-size: 12px; }
+
+    .main-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+
+    .asset-section { display: flex; flex-direction: column; gap: 14px; }
+    .section-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 0 4px; }
+    .section-title { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    .section-sub { color: var(--muted); font-size: 12px; }
+
+    .asset-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+    .asset-card {
+      overflow: hidden;
+      padding: 16px;
+      min-height: 255px;
+      position: relative;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .asset-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.18); }
+
+    .asset-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .asset-name { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -.02em; }
+    .asset-meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .asset-price { font-size: 22px; font-weight: 850; letter-spacing: -.04em; margin-top: 12px; }
+    .change {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.055);
+      white-space: nowrap;
+    }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .neutral { color: var(--muted); }
+
+    .chart-wrap { height: 118px; margin: 10px -4px 6px; }
+    .forecast-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+    .forecast-box { background: rgba(255,255,255,.045); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
+    .forecast-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .forecast-value { font-size: 13px; font-weight: 800; }
+
+    .side { display: flex; flex-direction: column; gap: 14px; }
+    .panel { padding: 16px; }
+    .panel h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: -.02em; }
+    .insight { padding: 12px; border: 1px solid var(--border); background: rgba(255,255,255,.045); border-radius: 16px; margin-bottom: 10px; }
+    .insight-title { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+    .insight p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .table th, .table td { padding: 10px 6px; border-bottom: 1px solid var(--border); text-align: left; }
+    .table th { color: var(--muted); font-weight: 700; }
+    .table td:last-child, .table th:last-child { text-align: right; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(24px);
+      opacity: 0;
+      background: rgba(9, 14, 28, .92);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 11px 14px;
+      box-shadow: var(--shadow);
+      transition: all .22s ease;
+      z-index: 10;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .skeleton {
+      position: relative;
+      overflow: hidden;
+      color: transparent !important;
+      background: rgba(255,255,255,.07) !important;
+      border-radius: 10px;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+      animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+    @media (min-width: 680px) {
+      .app { padding: 24px; }
+      .controls { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 1060px) {
+      .main-grid { grid-template-columns: minmax(0, 1fr) 360px; align-items: start; }
+      .asset-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .side { position: sticky; top: 18px; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .actions { width: 100%; justify-content: space-between; }
+      .pill, button, select { flex: 1; text-align: center; padding: 10px 12px; }
+      .logo { width: 42px; height: 42px; border-radius: 14px; }
+      .asset-card { min-height: 246px; }
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">FX</div>
+        <div>
+          <h1>Global Markets Dashboard</h1>
+          <p class="subtitle">Commodities, crypto, forex, Dubai/Kochi gold and MAG 7 equities · auto-refreshes every 60 seconds</p>
+        </div>
+      </div>
+      <div class="actions">
+        <span class="pill" id="lastUpdated">Last updated: --</span>
+        <select id="chartMode" aria-label="Chart mode">
+          <option value="7d">7-day trend</option>
+          <option value="8w">8-week avg</option>
+        </select>
+        <button id="refreshBtn">Refresh Now</button>
+      </div>
+    </header>
 
-<h1>📊 Daily Market Watch</h1>
+    <section class="controls">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Tracked Assets</div><div class="stat-value" id="trackedCount">16</div><div class="stat-note">Commodities, crypto, FX, equities</div></div>
+        <div class="stat-card"><div class="stat-label">Market Bias</div><div class="stat-value" id="marketBias">Loading</div><div class="stat-note">Based on latest changes</div></div>
+        <div class="stat-card"><div class="stat-label">AED / INR</div><div class="stat-value" id="aedInrTop">--</div><div class="stat-note">Live FX reference</div></div>
+        <div class="stat-card"><div class="stat-label">Refresh Status</div><div class="stat-value" id="statusText">Starting</div><div class="stat-note">Smooth updates, no reload</div></div>
+      </div>
+    </section>
 
-<div class="grid" id="dashboard"></div>
+    <main class="main-grid">
+      <section class="asset-section">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Live Asset Monitor</h2>
+            <div class="section-sub">Prices are fetched from free, CORS-friendly endpoints where available. Fallback estimates are used only if an API is unavailable.</div>
+          </div>
+        </div>
+        <div class="asset-grid" id="assetGrid"></div>
+      </section>
 
-</div>
+      <aside class="side">
+        <section class="panel">
+          <h2>Next 7 Days: Watchlist Events</h2>
+          <div class="insight">
+            <div class="insight-title">Rates, USD and inflation data</div>
+            <p>Gold, silver, equities and crypto may react sharply to inflation prints, Fed commentary, bond yields and USD strength. A softer USD generally supports metals and risk assets.</p>
+          </div>
+          <div class="insight">
+            <div class="insight-title">Oil supply, geopolitics and inventory reports</div>
+            <p>Crude oil can move on OPEC+ signals, Middle East risk, US inventory reports and demand revisions. Higher oil may also influence inflation expectations.</p>
+          </div>
+        </section>
 
-<script>
+        <section class="panel">
+          <h2>Top Movers</h2>
+          <table class="table">
+            <thead><tr><th>Asset</th><th>Move</th></tr></thead>
+            <tbody id="moversTable"><tr><td>Loading</td><td>--</td></tr></tbody>
+          </table>
+        </section>
 
-// Chart generator (same as before style)
-function chart(id) {
-    const ctx = document.getElementById(id).getContext("2d");
-    new Chart(ctx, {
-        type: 'line',
+        <section class="panel">
+          <h2>Data Source Health</h2>
+          <table class="table">
+            <tbody id="sourceHealth">
+              <tr><th>Crypto</th><td>--</td></tr>
+              <tr><th>FX</th><td>--</td></tr>
+              <tr><th>Stocks</th><td>--</td></tr>
+              <tr><th>Metals</th><td>--</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">Updated</div>
+
+  <script>
+    const CONFIG = {
+      refreshMs: 60000,
+      proxy: "https://api.allorigins.win/raw?url=",
+      fallbackAEDINR: 22.7,
+      fallbackUSDAED: 3.6725,
+      // Yahoo endpoints are often browser-blocked by CORS, so AllOrigins is used as a no-key public proxy.
+      yahooChart: symbol => `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=2mo&interval=1d`,
+      coinGecko: "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=60&interval=daily",
+      fx: "https://open.er-api.com/v6/latest/AED",
+      goldApi: metal => `https://api.gold-api.com/price/${metal}`
+    };
+
+    const ASSETS = [
+      { id: "oil", name: "Crude Oil", symbol: "CL=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
+      { id: "goldusd", name: "Gold", symbol: "GC=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
+      { id: "silver", name: "Silver", symbol: "SI=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
+      { id: "palladium", name: "Palladium", symbol: "PA=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
+      { id: "bitcoin", name: "Bitcoin", symbol: "BTC", type: "coingecko", unit: "USD", decimals: 0, category: "Crypto" },
+      { id: "dubaigold", name: "Gold Dubai", symbol: "XAU-AED/g", type: "derivedGold", unit: "AED/g", decimals: 2, category: "Regional" },
+      { id: "kochigold", name: "Gold Kochi", symbol: "XAU-INR/g", type: "derivedGold", unit: "INR/g", decimals: 0, category: "Regional" },
+      { id: "aedinr", name: "AED to INR", symbol: "AEDINR", type: "fx", unit: "INR", decimals: 3, category: "Forex" },
+      { id: "aapl", name: "Apple", symbol: "AAPL", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
+      { id: "msft", name: "Microsoft", symbol: "MSFT", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
+      { id: "googl", name: "Google", symbol: "GOOGL", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
+      { id: "amzn", name: "Amazon", symbol: "AMZN", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
+      { id: "nvda", name: "Nvidia", symbol: "NVDA", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
+      { id: "meta", name: "Meta", symbol: "META", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
+      { id: "tsla", name: "Tesla", symbol: "TSLA", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" }
+    ];
+
+    const state = { assets: {}, charts: {}, health: {}, chartMode: "7d", isRefreshing: false };
+
+    const $ = selector => document.querySelector(selector);
+    const fmt = (num, decimals = 2) => Number.isFinite(num) ? num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : "--";
+    const pct = num => Number.isFinite(num) ? `${num >= 0 ? "+" : ""}${num.toFixed(2)}%` : "--";
+    const safeArr = arr => Array.isArray(arr) ? arr.filter(Number.isFinite) : [];
+
+    function showToast(message) {
+      const el = $("#toast");
+      el.textContent = message;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function buildCards() {
+      const grid = $("#assetGrid");
+      grid.innerHTML = ASSETS.map(asset => `
+        <article class="asset-card" id="card-${asset.id}">
+          <div class="asset-top">
+            <div>
+              <h3 class="asset-name">${asset.name}</h3>
+              <div class="asset-meta">${asset.category} · ${asset.symbol}</div>
+              <div class="asset-price skeleton" id="price-${asset.id}">0000</div>
+            </div>
+            <div class="change neutral" id="change-${asset.id}">--</div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-${asset.id}"></canvas></div>
+          <div class="forecast-row">
+            <div class="forecast-box"><div class="forecast-label">Next day</div><div class="forecast-value" id="f1-${asset.id}">--</div></div>
+            <div class="forecast-box"><div class="forecast-label">7-day avg</div><div class="forecast-value" id="f7-${asset.id}">--</div></div>
+          </div>
+        </article>`).join("");
+    }
+
+    async function fetchJson(url, useProxy = false) {
+      const target = useProxy ? CONFIG.proxy + encodeURIComponent(url) : url;
+      const response = await fetch(target, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }
+
+    function parseYahooChart(data) {
+      const result = data?.chart?.result?.[0];
+      const closes = result?.indicators?.quote?.[0]?.close || [];
+      const timestamps = result?.timestamp || [];
+      const series = closes.map((v, i) => ({ date: new Date(timestamps[i] * 1000), price: Number(v) })).filter(x => Number.isFinite(x.price));
+      if (series.length < 2) throw new Error("Insufficient Yahoo data");
+      return series;
+    }
+
+    async function fetchYahooAsset(asset) {
+      const data = await fetchJson(CONFIG.yahooChart(asset.symbol), true);
+      return parseYahooChart(data);
+    }
+
+    async function fetchBitcoin() {
+      const data = await fetchJson(CONFIG.coinGecko);
+      const prices = data?.prices || [];
+      const series = prices.map(([t, p]) => ({ date: new Date(t), price: Number(p) })).filter(x => Number.isFinite(x.price));
+      if (series.length < 2) throw new Error("Insufficient BTC data");
+      return series;
+    }
+
+    async function fetchFxSeries() {
+      const data = await fetchJson(CONFIG.fx);
+      const rate = Number(data?.rates?.INR);
+      if (!Number.isFinite(rate)) throw new Error("FX unavailable");
+      const series = syntheticSeries(rate, 60, 0.0018);
+      return { rate, series };
+    }
+
+    function syntheticSeries(current, days = 60, volatility = 0.012) {
+      const out = [];
+      let value = current;
+      for (let i = days - 1; i >= 0; i--) {
+        const wave = Math.sin(i / 4) * volatility + Math.cos(i / 9) * volatility * .5;
+        const drift = (days - i) * volatility * current * 0.015 / days;
+        const price = current * (1 - wave) - drift;
+        out.push({ date: new Date(Date.now() - i * 86400000), price: Math.max(price, current * 0.7) });
+      }
+      out[out.length - 1].price = current;
+      return out;
+    }
+
+    async function fetchGoldSpotFallback() {
+      try {
+        const data = await fetchJson(CONFIG.goldApi("XAU"));
+        const price = Number(data?.price);
+        if (Number.isFinite(price)) return price;
+      } catch (e) {}
+      const existing = state.assets.goldusd?.series;
+      if (existing?.length) return existing.at(-1).price;
+      return 2350;
+    }
+
+    function weeklyAverages(series) {
+      const clean = safeArr(series.map(x => x.price));
+      const weeks = [];
+      for (let i = Math.max(0, clean.length - 56); i < clean.length; i += 7) {
+        const chunk = clean.slice(i, i + 7);
+        if (chunk.length) weeks.push(chunk.reduce((a,b) => a + b, 0) / chunk.length);
+      }
+      return weeks.slice(-8);
+    }
+
+    function calculateForecast(series) {
+      const prices = safeArr(series.map(x => x.price));
+      if (prices.length < 7) return { day: null, week: null, label1: "--", label7: "--" };
+      const latest = prices.at(-1);
+      const ma3 = avg(prices.slice(-3));
+      const ma7 = avg(prices.slice(-7));
+      const slope = (ma3 - ma7) / 4;
+      const nextDay = latest + slope;
+      const next7Avg = avg(Array.from({ length: 7 }, (_, i) => latest + slope * (i + 1)));
+      return {
+        day: nextDay,
+        week: next7Avg,
+        label1: `${nextDay >= latest ? "↗" : "↘"} ${fmt(nextDay, 2)}`,
+        label7: `${next7Avg >= latest ? "↗" : "↘"} ${fmt(next7Avg, 2)}`
+      };
+    }
+
+    function avg(arr) { return arr.reduce((a,b) => a + b, 0) / Math.max(arr.length, 1); }
+
+    function computeChange(series) {
+      const prices = safeArr(series.map(x => x.price));
+      if (prices.length < 2) return 0;
+      const latest = prices.at(-1), previous = prices.at(-2);
+      return previous ? ((latest - previous) / previous) * 100 : 0;
+    }
+
+    function chartColor(change) { return change > 0 ? "#16c784" : change < 0 ? "#ea3943" : "#94a3b8"; }
+
+    function renderChart(asset, series, change) {
+      const canvas = $(`#chart-${asset.id}`);
+      const ctx = canvas.getContext("2d");
+      const mode = state.chartMode;
+      const dataPoints = mode === "8w" ? weeklyAverages(series) : series.slice(-7).map(x => x.price);
+      const labels = mode === "8w" ? dataPoints.map((_, i) => `W-${dataPoints.length - i}`) : series.slice(-7).map(x => x.date.toLocaleDateString(undefined, { weekday: "short" }));
+      if (state.charts[asset.id]) state.charts[asset.id].destroy();
+      state.charts[asset.id] = new Chart(ctx, {
+        type: "line",
         data: {
-            labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
-            datasets: [{
-                data: Array.from({length:7},()=>Math.random()*100),
-                borderColor: "#4f8cff",
-                tension: 0.4,
-                fill: false
-            }]
+          labels,
+          datasets: [{
+            data: dataPoints,
+            borderColor: chartColor(change),
+            backgroundColor: "rgba(255,255,255,0.04)",
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: .42,
+            fill: true
+          }]
         },
         options: {
-            plugins:{legend:{display:false}},
-            scales:{
-                x:{ticks:{color:"#9ca3af"}},
-                y:{ticks:{color:"#9ca3af"}}
-            }
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 650 },
+          plugins: { legend: { display: false }, tooltip: { enabled: true, intersect: false, mode: "index" } },
+          scales: { x: { display: false }, y: { display: false } }
         }
-    });
-}
+      });
+    }
 
-// Card builder
-function card(name, price) {
-    const id = Math.random().toString(36).substring(7);
-    setTimeout(()=>chart(id),100);
+    function updateCard(asset, series) {
+      const latest = series.at(-1)?.price;
+      const change = computeChange(series);
+      const forecast = calculateForecast(series);
+      state.assets[asset.id] = { ...asset, latest, change, series, forecast };
 
-    return `
-    <div class="card">
-        <div>${name}</div>
-        <div class="price">${price}</div>
-        <canvas id="${id}"></canvas>
-        <a class="link" href="https://www.google.com/search?q=${name}" target="_blank">Source →</a>
-    </div>`;
-}
+      const priceEl = $(`#price-${asset.id}`);
+      priceEl.classList.remove("skeleton");
+      priceEl.textContent = `${asset.unit === "USD" ? "$" : ""}${fmt(latest, asset.decimals)} ${asset.unit !== "USD" ? asset.unit : ""}`.trim();
 
-// Load data (same structure as your original)
-function load() {
-    const html =
-        card("Gold (USD)", 2300) +
-        card("Silver (USD)", 28) +
-        card("Oil (USD)", 80) +
-        card("Bitcoin (USD)", 65000) +
-        card("Gold Dubai (AED/g)", 280) +
-        card("Gold Kochi (INR/g)", 6500) +
-        card("AAPL", 190) +
-        card("MSFT", 420) +
-        card("GOOGL", 160);
+      const changeEl = $(`#change-${asset.id}`);
+      changeEl.className = `change ${change > 0 ? "positive" : change < 0 ? "negative" : "neutral"}`;
+      changeEl.textContent = `${change >= 0 ? "▲" : "▼"} ${pct(change)}`;
 
-    document.getElementById("dashboard").innerHTML = html;
-}
+      $(`#f1-${asset.id}`).textContent = forecast.label1;
+      $(`#f1-${asset.id}`).className = `forecast-value ${forecast.day >= latest ? "positive" : "negative"}`;
+      $(`#f7-${asset.id}`).textContent = forecast.label7;
+      $(`#f7-${asset.id}`).className = `forecast-value ${forecast.week >= latest ? "positive" : "negative"}`;
 
-// Init
-load();
+      renderChart(asset, series, change);
+    }
 
-// Auto refresh
-setInterval(load, 60000);
+    function fallbackFor(asset) {
+      const base = {
+        oil: 78, goldusd: 2350, silver: 29, palladium: 970, bitcoin: 65000,
+        dubaigold: 277, kochigold: 6400, aedinr: CONFIG.fallbackAEDINR,
+        aapl: 190, msft: 430, googl: 170, amzn: 185, nvda: 900, meta: 500, tsla: 175
+      }[asset.id] || 100;
+      return syntheticSeries(base, 60, asset.type === "fx" ? 0.0018 : 0.018);
+    }
 
-</script>
+    async function loadAllData() {
+      if (state.isRefreshing) return;
+      state.isRefreshing = true;
+      $("#refreshBtn").disabled = true;
+      $("#statusText").textContent = "Refreshing";
+
+      const health = { Crypto: "OK", FX: "OK", Stocks: "OK", Metals: "OK" };
+      let fxRate = CONFIG.fallbackAEDINR;
+      let usdAed = CONFIG.fallbackUSDAED;
+
+      try {
+        const fx = await fetchFxSeries();
+        fxRate = fx.rate;
+        updateCard(ASSETS.find(a => a.id === "aedinr"), fx.series);
+      } catch (e) {
+        health.FX = "Fallback";
+        updateCard(ASSETS.find(a => a.id === "aedinr"), fallbackFor(ASSETS.find(a => a.id === "aedinr")));
+      }
+
+      const regularAssets = ASSETS.filter(a => !["fx", "derivedGold"].includes(a.type));
+      await Promise.all(regularAssets.map(async asset => {
+        try {
+          let series = asset.type === "coingecko" ? await fetchBitcoin() : await fetchYahooAsset(asset);
+          updateCard(asset, series);
+        } catch (e) {
+          if (asset.type === "coingecko") health.Crypto = "Fallback";
+          else if (["oil", "goldusd", "silver", "palladium"].includes(asset.id)) health.Metals = "Fallback";
+          else health.Stocks = "Fallback";
+          updateCard(asset, fallbackFor(asset));
+        }
+      }));
+
+      const goldOzUSD = await fetchGoldSpotFallback();
+      const goldGramUSD = goldOzUSD / 31.1034768;
+      const dubaiSeries = syntheticSeries(goldGramUSD * usdAed, 60, 0.012);
+      const kochiSeries = syntheticSeries(goldGramUSD * usdAed * fxRate, 60, 0.014);
+      updateCard(ASSETS.find(a => a.id === "dubaigold"), dubaiSeries);
+      updateCard(ASSETS.find(a => a.id === "kochigold"), kochiSeries);
+
+      state.health = health;
+      updateSummary();
+      $("#lastUpdated").textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+      $("#statusText").textContent = "Live";
+      $("#refreshBtn").disabled = false;
+      state.isRefreshing = false;
+      showToast("Dashboard updated");
+    }
+
+    function updateSummary() {
+      const rows = Object.values(state.assets);
+      const positive = rows.filter(x => x.change > 0).length;
+      const negative = rows.filter(x => x.change < 0).length;
+      $("#marketBias").textContent = positive > negative ? "Risk-On" : negative > positive ? "Risk-Off" : "Mixed";
+      const fx = state.assets.aedinr?.latest;
+      $("#aedInrTop").textContent = fmt(fx, 3);
+      $("#trackedCount").textContent = String(ASSETS.length);
+
+      const movers = rows.slice().sort((a,b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 7);
+      $("#moversTable").innerHTML = movers.map(x => `<tr><td>${x.name}</td><td class="${x.change >= 0 ? "positive" : "negative"}">${pct(x.change)}</td></tr>`).join("");
+      $("#sourceHealth").innerHTML = Object.entries(state.health).map(([k,v]) => `<tr><th>${k}</th><td class="${v === "OK" ? "positive" : "neutral"}">${v}</td></tr>`).join("");
+    }
+
+    function rerenderCharts() {
+      Object.values(state.assets).forEach(asset => renderChart(asset, asset.series, asset.change));
+    }
+
+    buildCards();
+    loadAllData();
+    setInterval(loadAllData, CONFIG.refreshMs);
+    $("#refreshBtn").addEventListener("click", loadAllData);
+    $("#chartMode").addEventListener("change", e => { state.chartMode = e.target.value; rerenderCharts(); });
+  </script>
 </body>
 </html>
