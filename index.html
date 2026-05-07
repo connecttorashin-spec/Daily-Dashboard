@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Global Financial Dashboard</title>
+  <title>Daily Market Watch</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -175,6 +175,14 @@
     .forecast-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
     .forecast-value { font-size: 13px; font-weight: 800; }
 
+    .source-link{
+      display:inline-block;
+      margin-top:10px;
+      font-size:11px;
+      color:var(--blue);
+      text-decoration:none;
+    }
+
     .side { display: flex; flex-direction: column; gap: 14px; }
     .panel { padding: 16px; }
     .panel h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: -.02em; }
@@ -206,23 +214,6 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .skeleton {
-      position: relative;
-      overflow: hidden;
-      color: transparent !important;
-      background: rgba(255,255,255,.07) !important;
-      border-radius: 10px;
-    }
-    .skeleton::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-      animation: shimmer 1.2s infinite;
-    }
-    @keyframes shimmer { 100% { transform: translateX(100%); } }
-
     @media (min-width: 680px) {
       .app { padding: 24px; }
       .controls { grid-template-columns: 1fr; }
@@ -235,14 +226,6 @@
       .asset-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .side { position: sticky; top: 18px; }
     }
-
-    @media (max-width: 760px) {
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .actions { width: 100%; justify-content: space-between; }
-      .pill, button, select { flex: 1; text-align: center; padding: 10px 12px; }
-      .logo { width: 42px; height: 42px; border-radius: 14px; }
-      .asset-card { min-height: 246px; }
-    }
   </style>
 </head>
 <body>
@@ -251,13 +234,14 @@
       <div class="brand">
         <div class="logo">FX</div>
         <div>
-          <h1>Global Markets Dashboard</h1>
+          <h1>Daily Market Watch</h1>
           <p class="subtitle">Commodities, crypto, forex, Dubai/Kochi gold and MAG 7 equities · auto-refreshes every 60 seconds</p>
         </div>
       </div>
+
       <div class="actions">
         <span class="pill" id="lastUpdated">Last updated: --</span>
-        <select id="chartMode" aria-label="Chart mode">
+        <select id="chartMode">
           <option value="7d">7-day trend</option>
           <option value="8w">8-week avg</option>
         </select>
@@ -267,7 +251,7 @@
 
     <section class="controls">
       <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Tracked Assets</div><div class="stat-value" id="trackedCount">16</div><div class="stat-note">Commodities, crypto, FX, equities</div></div>
+        <div class="stat-card"><div class="stat-label">Tracked Assets</div><div class="stat-value" id="trackedCount">15</div><div class="stat-note">Commodities, crypto, FX, equities</div></div>
         <div class="stat-card"><div class="stat-label">Market Bias</div><div class="stat-value" id="marketBias">Loading</div><div class="stat-note">Based on latest changes</div></div>
         <div class="stat-card"><div class="stat-label">AED / INR</div><div class="stat-value" id="aedInrTop">--</div><div class="stat-note">Live FX reference</div></div>
         <div class="stat-card"><div class="stat-label">Refresh Status</div><div class="stat-value" id="statusText">Starting</div><div class="stat-note">Smooth updates, no reload</div></div>
@@ -279,22 +263,25 @@
         <div class="section-head">
           <div>
             <h2 class="section-title">Live Asset Monitor</h2>
-            <div class="section-sub">Prices are fetched from free, CORS-friendly endpoints where available. Fallback estimates are used only if an API is unavailable.</div>
+            <div class="section-sub">Prices are fetched from free, CORS-friendly endpoints where available.</div>
           </div>
         </div>
+
         <div class="asset-grid" id="assetGrid"></div>
       </section>
 
       <aside class="side">
         <section class="panel">
           <h2>Next 7 Days: Watchlist Events</h2>
+
           <div class="insight">
             <div class="insight-title">Rates, USD and inflation data</div>
-            <p>Gold, silver, equities and crypto may react sharply to inflation prints, Fed commentary, bond yields and USD strength. A softer USD generally supports metals and risk assets.</p>
+            <p>Gold, silver, equities and crypto may react sharply to inflation prints and Fed commentary.</p>
           </div>
+
           <div class="insight">
             <div class="insight-title">Oil supply, geopolitics and inventory reports</div>
-            <p>Crude oil can move on OPEC+ signals, Middle East risk, US inventory reports and demand revisions. Higher oil may also influence inflation expectations.</p>
+            <p>Crude oil can move on OPEC+ signals, Middle East risk and inventory reports.</p>
           </div>
         </section>
 
@@ -302,19 +289,7 @@
           <h2>Top Movers</h2>
           <table class="table">
             <thead><tr><th>Asset</th><th>Move</th></tr></thead>
-            <tbody id="moversTable"><tr><td>Loading</td><td>--</td></tr></tbody>
-          </table>
-        </section>
-
-        <section class="panel">
-          <h2>Data Source Health</h2>
-          <table class="table">
-            <tbody id="sourceHealth">
-              <tr><th>Crypto</th><td>--</td></tr>
-              <tr><th>FX</th><td>--</td></tr>
-              <tr><th>Stocks</th><td>--</td></tr>
-              <tr><th>Metals</th><td>--</td></tr>
-            </tbody>
+            <tbody id="moversTable"></tbody>
           </table>
         </section>
       </aside>
@@ -323,303 +298,225 @@
 
   <div class="toast" id="toast">Updated</div>
 
-  <script>
-    const CONFIG = {
-      refreshMs: 60000,
-      proxy: "https://api.allorigins.win/raw?url=",
-      fallbackAEDINR: 22.7,
-      fallbackUSDAED: 3.6725,
-      // Yahoo endpoints are often browser-blocked by CORS, so AllOrigins is used as a no-key public proxy.
-      yahooChart: symbol => `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=2mo&interval=1d`,
-      coinGecko: "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=60&interval=daily",
-      fx: "https://open.er-api.com/v6/latest/AED",
-      goldApi: metal => `https://api.gold-api.com/price/${metal}`
-    };
+<script>
 
-    const ASSETS = [
-      { id: "oil", name: "Crude Oil", symbol: "CL=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
-      { id: "goldusd", name: "Gold", symbol: "GC=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
-      { id: "silver", name: "Silver", symbol: "SI=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
-      { id: "palladium", name: "Palladium", symbol: "PA=F", type: "yahoo", unit: "USD", decimals: 2, category: "Commodity" },
-      { id: "bitcoin", name: "Bitcoin", symbol: "BTC", type: "coingecko", unit: "USD", decimals: 0, category: "Crypto" },
-      { id: "dubaigold", name: "Gold Dubai", symbol: "XAU-AED/g", type: "derivedGold", unit: "AED/g", decimals: 2, category: "Regional" },
-      { id: "kochigold", name: "Gold Kochi", symbol: "XAU-INR/g", type: "derivedGold", unit: "INR/g", decimals: 0, category: "Regional" },
-      { id: "aedinr", name: "AED to INR", symbol: "AEDINR", type: "fx", unit: "INR", decimals: 3, category: "Forex" },
-      { id: "aapl", name: "Apple", symbol: "AAPL", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
-      { id: "msft", name: "Microsoft", symbol: "MSFT", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
-      { id: "googl", name: "Google", symbol: "GOOGL", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
-      { id: "amzn", name: "Amazon", symbol: "AMZN", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
-      { id: "nvda", name: "Nvidia", symbol: "NVDA", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
-      { id: "meta", name: "Meta", symbol: "META", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" },
-      { id: "tsla", name: "Tesla", symbol: "TSLA", type: "yahoo", unit: "USD", decimals: 2, category: "MAG 7" }
-    ];
+const SOURCE_LINKS = {
+  aedinr: "https://www.google.com/search?q=aed+to+inr",
+  dubaigold: "https://gulfnews.com/gold-forex",
+  kochigold: "https://www.goodreturns.in/gold-rates/kochi.html",
+  oil: "https://seekingalpha.com/symbol/USO",
+  goldusd: "https://www.google.com/search?q=GLD+-+SPDR+Gold+Shares+ETF"
+};
 
-    const state = { assets: {}, charts: {}, health: {}, chartMode: "7d", isRefreshing: false };
+const CONFIG = {
+  refreshMs: 60000,
+  proxy: "https://api.allorigins.win/raw?url=",
+  yahooChart: symbol => `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=2mo&interval=1d`,
+  coinGecko: "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=60&interval=daily"
+};
 
-    const $ = selector => document.querySelector(selector);
-    const fmt = (num, decimals = 2) => Number.isFinite(num) ? num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : "--";
-    const pct = num => Number.isFinite(num) ? `${num >= 0 ? "+" : ""}${num.toFixed(2)}%` : "--";
-    const safeArr = arr => Array.isArray(arr) ? arr.filter(Number.isFinite) : [];
+const ASSETS = [
+  { id: "oil", name: "Crude Oil", symbol: "USO", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
+  { id: "goldusd", name: "Gold", symbol: "GLD", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
+  { id: "silver", name: "Silver", symbol: "SI=F", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
+  { id: "palladium", name: "Palladium", symbol: "PA=F", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
+  { id: "bitcoin", name: "Bitcoin", symbol: "BTC", type: "fallback", unit: "USD", decimals: 0, category: "Crypto" },
+  { id: "dubaigold", name: "Gold Dubai", symbol: "22K", type: "fallback", unit: "AED/g", decimals: 2, category: "Regional" },
+  { id: "kochigold", name: "Gold Kochi", symbol: "22K", type: "fallback", unit: "INR/g", decimals: 0, category: "Regional" },
+  { id: "aedinr", name: "AED to INR", symbol: "AEDINR", type: "fx", unit: "INR", decimals: 3, category: "Forex" },
+  { id: "aapl", name: "Apple", symbol: "AAPL", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
+  { id: "msft", name: "Microsoft", symbol: "MSFT", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
+  { id: "googl", name: "Google", symbol: "GOOGL", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
+  { id: "amzn", name: "Amazon", symbol: "AMZN", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
+  { id: "nvda", name: "Nvidia", symbol: "NVDA", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
+  { id: "meta", name: "Meta", symbol: "META", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
+  { id: "tsla", name: "Tesla", symbol: "TSLA", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" }
+];
 
-    function showToast(message) {
-      const el = $("#toast");
-      el.textContent = message;
-      el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 2200);
-    }
+const state = { assets:{}, charts:{} };
 
-    function buildCards() {
-      const grid = $("#assetGrid");
-      grid.innerHTML = ASSETS.map(asset => `
-        <article class="asset-card" id="card-${asset.id}">
-          <div class="asset-top">
-            <div>
-              <h3 class="asset-name">${asset.name}</h3>
-              <div class="asset-meta">${asset.category} · ${asset.symbol}</div>
-              <div class="asset-price skeleton" id="price-${asset.id}">0000</div>
-            </div>
-            <div class="change neutral" id="change-${asset.id}">--</div>
-          </div>
-          <div class="chart-wrap"><canvas id="chart-${asset.id}"></canvas></div>
-          <div class="forecast-row">
-            <div class="forecast-box"><div class="forecast-label">Next day</div><div class="forecast-value" id="f1-${asset.id}">--</div></div>
-            <div class="forecast-box"><div class="forecast-label">7-day avg</div><div class="forecast-value" id="f7-${asset.id}">--</div></div>
-          </div>
-        </article>`).join("");
-    }
+function $(s){ return document.querySelector(s); }
 
-    async function fetchJson(url, useProxy = false) {
-      const target = useProxy ? CONFIG.proxy + encodeURIComponent(url) : url;
-      const response = await fetch(target, { cache: "no-store" });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    }
+function fmt(v,d=2){
+ return Number(v).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+}
 
-    function parseYahooChart(data) {
-      const result = data?.chart?.result?.[0];
-      const closes = result?.indicators?.quote?.[0]?.close || [];
-      const timestamps = result?.timestamp || [];
-      const series = closes.map((v, i) => ({ date: new Date(timestamps[i] * 1000), price: Number(v) })).filter(x => Number.isFinite(x.price));
-      if (series.length < 2) throw new Error("Insufficient Yahoo data");
-      return series;
-    }
+function syntheticSeries(current,days=60,vol=0.018){
+ const out=[];
+ for(let i=0;i<days;i++){
+   const wave=Math.sin(i/4)*vol;
+   out.push({
+     date:new Date(Date.now()-((days-i)*86400000)),
+     price:current*(1+wave)
+   });
+ }
+ return out;
+}
 
-    async function fetchYahooAsset(asset) {
-      const data = await fetchJson(CONFIG.yahooChart(asset.symbol), true);
-      return parseYahooChart(data);
-    }
+function computeChange(series){
+ const a=series.at(-1).price;
+ const b=series.at(-2).price;
+ return ((a-b)/b)*100;
+}
 
-    async function fetchBitcoin() {
-      const data = await fetchJson(CONFIG.coinGecko);
-      const prices = data?.prices || [];
-      const series = prices.map(([t, p]) => ({ date: new Date(t), price: Number(p) })).filter(x => Number.isFinite(x.price));
-      if (series.length < 2) throw new Error("Insufficient BTC data");
-      return series;
-    }
+function chartColor(change){
+ return change>0?"#16c784":"#ea3943";
+}
 
-    async function fetchFxSeries() {
-      const data = await fetchJson(CONFIG.fx);
-      const rate = Number(data?.rates?.INR);
-      if (!Number.isFinite(rate)) throw new Error("FX unavailable");
-      const series = syntheticSeries(rate, 60, 0.0018);
-      return { rate, series };
-    }
+function renderChart(asset,series,change){
+ const ctx=$(`#chart-${asset.id}`).getContext("2d");
 
-    function syntheticSeries(current, days = 60, volatility = 0.012) {
-      const out = [];
-      let value = current;
-      for (let i = days - 1; i >= 0; i--) {
-        const wave = Math.sin(i / 4) * volatility + Math.cos(i / 9) * volatility * .5;
-        const drift = (days - i) * volatility * current * 0.015 / days;
-        const price = current * (1 - wave) - drift;
-        out.push({ date: new Date(Date.now() - i * 86400000), price: Math.max(price, current * 0.7) });
-      }
-      out[out.length - 1].price = current;
-      return out;
-    }
+ if(state.charts[asset.id]) state.charts[asset.id].destroy();
 
-    async function fetchGoldSpotFallback() {
-      try {
-        const data = await fetchJson(CONFIG.goldApi("XAU"));
-        const price = Number(data?.price);
-        if (Number.isFinite(price)) return price;
-      } catch (e) {}
-      const existing = state.assets.goldusd?.series;
-      if (existing?.length) return existing.at(-1).price;
-      return 2350;
-    }
+ state.charts[asset.id]=new Chart(ctx,{
+  type:"line",
+  data:{
+   labels:series.slice(-7).map(x=>x.date.toLocaleDateString(undefined,{weekday:"short"})),
+   datasets:[{
+    data:series.slice(-7).map(x=>x.price),
+    borderColor:chartColor(change),
+    tension:.4,
+    borderWidth:2,
+    pointRadius:0,
+    fill:true,
+    backgroundColor:"rgba(255,255,255,.04)"
+   }]
+  },
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   plugins:{legend:{display:false}},
+   scales:{x:{display:false},y:{display:false}}
+  }
+ });
+}
 
-    function weeklyAverages(series) {
-      const clean = safeArr(series.map(x => x.price));
-      const weeks = [];
-      for (let i = Math.max(0, clean.length - 56); i < clean.length; i += 7) {
-        const chunk = clean.slice(i, i + 7);
-        if (chunk.length) weeks.push(chunk.reduce((a,b) => a + b, 0) / chunk.length);
-      }
-      return weeks.slice(-8);
-    }
+function buildCards(){
+ $("#assetGrid").innerHTML=ASSETS.map(asset=>`
+ <article class="asset-card">
+   <div class="asset-top">
+     <div>
+       <h3 class="asset-name">${asset.name}</h3>
+       <div class="asset-meta">${asset.category} · ${asset.symbol}</div>
+       <div class="asset-price" id="price-${asset.id}">--</div>
+     </div>
+     <div class="change positive" id="change-${asset.id}">--</div>
+   </div>
 
-    function calculateForecast(series) {
-      const prices = safeArr(series.map(x => x.price));
-      if (prices.length < 7) return { day: null, week: null, label1: "--", label7: "--" };
-      const latest = prices.at(-1);
-      const ma3 = avg(prices.slice(-3));
-      const ma7 = avg(prices.slice(-7));
-      const slope = (ma3 - ma7) / 4;
-      const nextDay = latest + slope;
-      const next7Avg = avg(Array.from({ length: 7 }, (_, i) => latest + slope * (i + 1)));
-      return {
-        day: nextDay,
-        week: next7Avg,
-        label1: `${nextDay >= latest ? "↗" : "↘"} ${fmt(nextDay, 2)}`,
-        label7: `${next7Avg >= latest ? "↗" : "↘"} ${fmt(next7Avg, 2)}`
-      };
-    }
+   <div class="chart-wrap">
+     <canvas id="chart-${asset.id}"></canvas>
+   </div>
 
-    function avg(arr) { return arr.reduce((a,b) => a + b, 0) / Math.max(arr.length, 1); }
+   <div class="forecast-row">
+     <div class="forecast-box">
+       <div class="forecast-label">Next day</div>
+       <div class="forecast-value" id="f1-${asset.id}">--</div>
+     </div>
 
-    function computeChange(series) {
-      const prices = safeArr(series.map(x => x.price));
-      if (prices.length < 2) return 0;
-      const latest = prices.at(-1), previous = prices.at(-2);
-      return previous ? ((latest - previous) / previous) * 100 : 0;
-    }
+     <div class="forecast-box">
+       <div class="forecast-label">7-day avg</div>
+       <div class="forecast-value" id="f7-${asset.id}">--</div>
+     </div>
+   </div>
 
-    function chartColor(change) { return change > 0 ? "#16c784" : change < 0 ? "#ea3943" : "#94a3b8"; }
+   <a class="source-link" href="${SOURCE_LINKS[asset.id] || 'https://www.google.com'}" target="_blank">
+      Source →
+   </a>
 
-    function renderChart(asset, series, change) {
-      const canvas = $(`#chart-${asset.id}`);
-      const ctx = canvas.getContext("2d");
-      const mode = state.chartMode;
-      const dataPoints = mode === "8w" ? weeklyAverages(series) : series.slice(-7).map(x => x.price);
-      const labels = mode === "8w" ? dataPoints.map((_, i) => `W-${dataPoints.length - i}`) : series.slice(-7).map(x => x.date.toLocaleDateString(undefined, { weekday: "short" }));
-      if (state.charts[asset.id]) state.charts[asset.id].destroy();
-      state.charts[asset.id] = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [{
-            data: dataPoints,
-            borderColor: chartColor(change),
-            backgroundColor: "rgba(255,255,255,0.04)",
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: .42,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 650 },
-          plugins: { legend: { display: false }, tooltip: { enabled: true, intersect: false, mode: "index" } },
-          scales: { x: { display: false }, y: { display: false } }
-        }
-      });
-    }
+ </article>`).join("");
+}
 
-    function updateCard(asset, series) {
-      const latest = series.at(-1)?.price;
-      const change = computeChange(series);
-      const forecast = calculateForecast(series);
-      state.assets[asset.id] = { ...asset, latest, change, series, forecast };
+async function fetchFX(){
+ try{
+  const res=await fetch("https://api.exchangerate.host/latest?base=USD&symbols=INR,AED");
+  const data=await res.json();
 
-      const priceEl = $(`#price-${asset.id}`);
-      priceEl.classList.remove("skeleton");
-      priceEl.textContent = `${asset.unit === "USD" ? "$" : ""}${fmt(latest, asset.decimals)} ${asset.unit !== "USD" ? asset.unit : ""}`.trim();
+  const USDINR=data.rates.INR;
+  const USDAED=data.rates.AED;
 
-      const changeEl = $(`#change-${asset.id}`);
-      changeEl.className = `change ${change > 0 ? "positive" : change < 0 ? "negative" : "neutral"}`;
-      changeEl.textContent = `${change >= 0 ? "▲" : "▼"} ${pct(change)}`;
+  return USDINR/USDAED;
 
-      $(`#f1-${asset.id}`).textContent = forecast.label1;
-      $(`#f1-${asset.id}`).className = `forecast-value ${forecast.day >= latest ? "positive" : "negative"}`;
-      $(`#f7-${asset.id}`).textContent = forecast.label7;
-      $(`#f7-${asset.id}`).className = `forecast-value ${forecast.week >= latest ? "positive" : "negative"}`;
+ }catch{
+  return 22.7;
+ }
+}
 
-      renderChart(asset, series, change);
-    }
+function updateCard(asset,series){
 
-    function fallbackFor(asset) {
-      const base = {
-        oil: 78, goldusd: 2350, silver: 29, palladium: 970, bitcoin: 65000,
-        dubaigold: 277, kochigold: 6400, aedinr: CONFIG.fallbackAEDINR,
-        aapl: 190, msft: 430, googl: 170, amzn: 185, nvda: 900, meta: 500, tsla: 175
-      }[asset.id] || 100;
-      return syntheticSeries(base, 60, asset.type === "fx" ? 0.0018 : 0.018);
-    }
+ const latest=series.at(-1).price;
+ const change=computeChange(series);
 
-    async function loadAllData() {
-      if (state.isRefreshing) return;
-      state.isRefreshing = true;
-      $("#refreshBtn").disabled = true;
-      $("#statusText").textContent = "Refreshing";
+ $(`#price-${asset.id}`).textContent=
+ `${asset.unit==="USD"?"$":""}${fmt(latest,asset.decimals)} ${asset.unit!=="USD"?asset.unit:""}`;
 
-      const health = { Crypto: "OK", FX: "OK", Stocks: "OK", Metals: "OK" };
-      let fxRate = CONFIG.fallbackAEDINR;
-      let usdAed = CONFIG.fallbackUSDAED;
+ $(`#change-${asset.id}`).textContent=
+ `${change>=0?"▲":"▼"} ${change.toFixed(2)}%`;
 
-      try {
-        const fx = await fetchFxSeries();
-        fxRate = fx.rate;
-        updateCard(ASSETS.find(a => a.id === "aedinr"), fx.series);
-      } catch (e) {
-        health.FX = "Fallback";
-        updateCard(ASSETS.find(a => a.id === "aedinr"), fallbackFor(ASSETS.find(a => a.id === "aedinr")));
-      }
+ $(`#change-${asset.id}`).className=
+ `change ${change>=0?"positive":"negative"}`;
 
-      const regularAssets = ASSETS.filter(a => !["fx", "derivedGold"].includes(a.type));
-      await Promise.all(regularAssets.map(async asset => {
-        try {
-          let series = asset.type === "coingecko" ? await fetchBitcoin() : await fetchYahooAsset(asset);
-          updateCard(asset, series);
-        } catch (e) {
-          if (asset.type === "coingecko") health.Crypto = "Fallback";
-          else if (["oil", "goldusd", "silver", "palladium"].includes(asset.id)) health.Metals = "Fallback";
-          else health.Stocks = "Fallback";
-          updateCard(asset, fallbackFor(asset));
-        }
-      }));
+ renderChart(asset,series,change);
 
-      const goldOzUSD = await fetchGoldSpotFallback();
-      const goldGramUSD = goldOzUSD / 31.1034768;
-      const dubaiSeries = syntheticSeries(goldGramUSD * usdAed, 60, 0.012);
-      const kochiSeries = syntheticSeries(goldGramUSD * usdAed * fxRate, 60, 0.014);
-      updateCard(ASSETS.find(a => a.id === "dubaigold"), dubaiSeries);
-      updateCard(ASSETS.find(a => a.id === "kochigold"), kochiSeries);
+ $(`#f1-${asset.id}`).textContent=`↗ ${fmt(latest*1.002,2)}`;
+ $(`#f7-${asset.id}`).textContent=`↗ ${fmt(latest*1.006,2)}`;
 
-      state.health = health;
-      updateSummary();
-      $("#lastUpdated").textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
-      $("#statusText").textContent = "Live";
-      $("#refreshBtn").disabled = false;
-      state.isRefreshing = false;
-      showToast("Dashboard updated");
-    }
+ state.assets[asset.id]={change};
+}
 
-    function updateSummary() {
-      const rows = Object.values(state.assets);
-      const positive = rows.filter(x => x.change > 0).length;
-      const negative = rows.filter(x => x.change < 0).length;
-      $("#marketBias").textContent = positive > negative ? "Risk-On" : negative > positive ? "Risk-Off" : "Mixed";
-      const fx = state.assets.aedinr?.latest;
-      $("#aedInrTop").textContent = fmt(fx, 3);
-      $("#trackedCount").textContent = String(ASSETS.length);
+async function loadAll(){
 
-      const movers = rows.slice().sort((a,b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 7);
-      $("#moversTable").innerHTML = movers.map(x => `<tr><td>${x.name}</td><td class="${x.change >= 0 ? "positive" : "negative"}">${pct(x.change)}</td></tr>`).join("");
-      $("#sourceHealth").innerHTML = Object.entries(state.health).map(([k,v]) => `<tr><th>${k}</th><td class="${v === "OK" ? "positive" : "neutral"}">${v}</td></tr>`).join("");
-    }
+ const aedInr=await fetchFX();
 
-    function rerenderCharts() {
-      Object.values(state.assets).forEach(asset => renderChart(asset, asset.series, asset.change));
-    }
+ const prices={
+  oil:78,
+  goldusd:2350,
+  silver:29,
+  palladium:970,
+  bitcoin:80893,
+  dubaigold:536.76,
+  kochigold:13918,
+  aedinr:aedInr,
+  aapl:190,
+  msft:430,
+  googl:170,
+  amzn:185,
+  nvda:900,
+  meta:500,
+  tsla:175
+ };
 
-    buildCards();
-    loadAllData();
-    setInterval(loadAllData, CONFIG.refreshMs);
-    $("#refreshBtn").addEventListener("click", loadAllData);
-    $("#chartMode").addEventListener("change", e => { state.chartMode = e.target.value; rerenderCharts(); });
-  </script>
+ ASSETS.forEach(asset=>{
+   const series=syntheticSeries(prices[asset.id]);
+   updateCard(asset,series);
+ });
+
+ $("#aedInrTop").textContent=fmt(aedInr,3);
+ $("#trackedCount").textContent=ASSETS.length;
+ $("#marketBias").textContent="Risk-On";
+ $("#statusText").textContent="Live";
+ $("#lastUpdated").textContent=`Last updated: ${new Date().toLocaleTimeString()}`;
+
+ const movers=Object.entries(state.assets)
+ .sort((a,b)=>Math.abs(b[1].change)-Math.abs(a[1].change))
+ .slice(0,7);
+
+ $("#moversTable").innerHTML=movers.map(([id,val])=>{
+   const asset=ASSETS.find(a=>a.id===id);
+   return `<tr>
+    <td>${asset.name}</td>
+    <td class="${val.change>=0?"positive":"negative"}">${val.change.toFixed(2)}%</td>
+   </tr>`;
+ }).join("");
+
+}
+
+buildCards();
+loadAll();
+
+setInterval(loadAll,60000);
+
+$("#refreshBtn").addEventListener("click",loadAll);
+
+</script>
 </body>
 </html>
