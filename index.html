@@ -426,32 +426,7 @@ function buildCards(){
  </article>`).join("");
 }
 
-async function fetchFX() {
-
-  try {
-
-    const res = await fetch(
-      "https://api.exchangerate.host/latest?base=AED&symbols=INR"
-    );
-
-    const data = await res.json();
-
-    const rate = Number(data?.rates?.INR);
-
-    if (!rate || isNaN(rate)) {
-      throw new Error("Invalid FX");
-    }
-
-    return rate;
-
-  } catch (e) {
-
-    console.error("FX Error", e);
-
-    return 25.66; // closer emergency fallback
-
-  }
-}{
+async function fetchFX(){
  try{
   const res=await fetch("https://api.exchangerate.host/latest?base=USD&symbols=INR,AED");
   const data=await res.json();
@@ -492,38 +467,7 @@ async function loadAll(){
 
  const aedInr=await fetchFX();
 
-const prices={
-
-  oil: 78.12,
-
-  goldusd: 3385,
-
-  silver: 32.4,
-
-  palladium: 978,
-
-  bitcoin: 96850,
-
-  dubaigold: 359.75,
-
-  kochigold: 7190,
-
-  aedinr: aedInr,
-
-  aapl: 198,
-
-  msft: 435,
-
-  googl: 167,
-
-  amzn: 189,
-
-  nvda: 116,
-
-  meta: 595,
-
-  tsla: 181
-};
+ const prices={
   oil:78,
   goldusd:2350,
   silver:29,
@@ -546,7 +490,7 @@ const prices={
    updateCard(asset,series);
  });
 
- $("#aedInrTop").textContent = fmt(prices.aedinr,3);
+ $("#aedInrTop").textContent=fmt(aedInr,3);
  $("#trackedCount").textContent=ASSETS.length;
  $("#marketBias").textContent="Risk-On";
  $("#statusText").textContent="Live";
