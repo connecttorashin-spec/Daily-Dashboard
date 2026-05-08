@@ -8,172 +8,241 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #060912;
       --bg-2: #0b1020;
       --card: rgba(18, 25, 45, 0.72);
-      --card-2: rgba(22, 31, 55, 0.9);
-      --border: rgba(255, 255, 255, 0.09);
+      --border: rgba(255,255,255,.09);
       --text: #f5f7fb;
       --muted: #94a3b8;
-      --muted-2: #64748b;
       --green: #16c784;
       --red: #ea3943;
-      --amber: #f59e0b;
       --blue: #38bdf8;
-      --purple: #a78bfa;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+      --shadow: 0 24px 80px rgba(0,0,0,.36);
       --radius: 22px;
     }
 
-    * { box-sizing: border-box; }
+    *{box-sizing:border-box;}
 
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
+    body{
+      margin:0;
+      font-family:Inter,sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 34%),
-        radial-gradient(circle at 80% 15%, rgba(167, 139, 250, 0.15), transparent 32%),
-        linear-gradient(140deg, var(--bg), var(--bg-2));
-      min-height: 100vh;
-      overflow-x: hidden;
+        radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 34%),
+        radial-gradient(circle at 80% 15%, rgba(167,139,250,.15), transparent 32%),
+        linear-gradient(140deg,var(--bg),var(--bg-2));
+      min-height:100vh;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), rgba(0,0,0,.15));
-      pointer-events: none;
-      z-index: -1;
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size:44px 44px;
+      pointer-events:none;
+      z-index:-1;
     }
 
-    .app { width: min(1480px, 100%); margin: 0 auto; padding: 18px; }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 18px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: rgba(8, 13, 28, 0.72);
-      backdrop-filter: blur(20px);
-      box-shadow: var(--shadow);
+    .app{
+      width:min(1480px,100%);
+      margin:0 auto;
+      padding:18px;
     }
 
-    .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
-
-    .logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #38bdf8, #a78bfa 55%, #16c784);
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      box-shadow: 0 12px 38px rgba(56, 189, 248, .22);
-      flex: 0 0 auto;
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      margin-bottom:18px;
+      padding:18px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:rgba(8,13,28,.72);
+      backdrop-filter:blur(20px);
+      box-shadow:var(--shadow);
     }
 
-    h1 { font-size: clamp(20px, 4vw, 34px); margin: 0 0 4px; letter-spacing: -0.04em; }
-    .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
-
-    .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
-
-    .pill, button, select {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.055);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font: inherit;
-      font-size: 13px;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
     }
 
-    button {
-      cursor: pointer;
-      font-weight: 700;
-      background: linear-gradient(135deg, rgba(56,189,248,.2), rgba(167,139,250,.19));
-      transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
-    }
-    button:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.24); }
-    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 18px;
+    .logo{
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      background:linear-gradient(135deg,#38bdf8,#a78bfa 55%,#16c784);
+      display:grid;
+      place-items:center;
+      font-weight:900;
     }
 
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+    h1{
+      font-size:34px;
+      margin:0 0 4px;
+      letter-spacing:-.04em;
     }
 
-    .stat-card, .panel, .asset-card {
-      border: 1px solid var(--border);
-      background: var(--card);
-      backdrop-filter: blur(22px);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
     }
 
-    .stat-card { padding: 15px; min-height: 94px; }
-    .stat-label { color: var(--muted); font-size: 12px; margin-bottom: 9px; }
-    .stat-value { font-size: 21px; font-weight: 800; letter-spacing: -.03em; }
-    .stat-note { margin-top: 7px; color: var(--muted-2); font-size: 12px; }
-
-    .main-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
-
-    .asset-section { display: flex; flex-direction: column; gap: 14px; }
-    .section-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 0 4px; }
-    .section-title { margin: 0; font-size: 17px; letter-spacing: -.02em; }
-    .section-sub { color: var(--muted); font-size: 12px; }
-
-    .asset-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-
-    .asset-card {
-      overflow: hidden;
-      padding: 16px;
-      min-height: 255px;
-      position: relative;
-      transition: transform .18s ease, border-color .18s ease;
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
-    .asset-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.18); }
 
-    .asset-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
-    .asset-name { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -.02em; }
-    .asset-meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
-    .asset-price { font-size: 22px; font-weight: 850; letter-spacing: -.04em; margin-top: 12px; }
-    .change {
-      display: inline-flex;
-      gap: 5px;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 800;
-      padding: 7px 9px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.055);
-      white-space: nowrap;
+    .pill,button,select{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.055);
+      color:var(--text);
+      border-radius:999px;
+      padding:10px 14px;
+      font:inherit;
+      font-size:13px;
     }
-    .positive { color: var(--green); }
-    .negative { color: var(--red); }
-    .neutral { color: var(--muted); }
 
-    .chart-wrap { height: 118px; margin: 10px -4px 6px; }
-    .forecast-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 12px; }
-    .forecast-box { background: rgba(255,255,255,.045); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
-    .forecast-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
-    .forecast-value { font-size: 13px; font-weight: 800; }
+    button{
+      cursor:pointer;
+      font-weight:700;
+      background:linear-gradient(135deg, rgba(56,189,248,.2), rgba(167,139,250,.19));
+    }
+
+    .stats-row{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .stat-card,.panel,.asset-card{
+      border:1px solid var(--border);
+      background:var(--card);
+      backdrop-filter:blur(22px);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .stat-card{
+      padding:15px;
+      min-height:94px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:9px;
+    }
+
+    .stat-value{
+      font-size:21px;
+      font-weight:800;
+    }
+
+    .stat-note{
+      margin-top:7px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 360px;
+      gap:18px;
+    }
+
+    .asset-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .asset-card{
+      overflow:hidden;
+      padding:16px;
+      min-height:255px;
+    }
+
+    .asset-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .asset-name{
+      margin:0;
+      font-size:15px;
+      font-weight:800;
+    }
+
+    .asset-meta{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:4px;
+    }
+
+    .asset-price{
+      font-size:22px;
+      font-weight:850;
+      margin-top:12px;
+    }
+
+    .change{
+      display:inline-flex;
+      gap:5px;
+      align-items:center;
+      font-size:12px;
+      font-weight:800;
+      padding:7px 9px;
+      border-radius:999px;
+      background:rgba(255,255,255,.055);
+      height:fit-content;
+    }
+
+    .positive{color:var(--green);}
+    .negative{color:var(--red);}
+
+    .chart-wrap{
+      height:118px;
+      margin:10px -4px 6px;
+    }
+
+    .forecast-row{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .forecast-box{
+      background:rgba(255,255,255,.045);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:10px;
+    }
+
+    .forecast-label{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:5px;
+    }
+
+    .forecast-value{
+      font-size:13px;
+      font-weight:800;
+    }
 
     .source-link{
       display:inline-block;
@@ -183,120 +252,166 @@
       text-decoration:none;
     }
 
-    .side { display: flex; flex-direction: column; gap: 14px; }
-    .panel { padding: 16px; }
-    .panel h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: -.02em; }
-    .insight { padding: 12px; border: 1px solid var(--border); background: rgba(255,255,255,.045); border-radius: 16px; margin-bottom: 10px; }
-    .insight-title { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
-    .insight p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
-
-    .table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .table th, .table td { padding: 10px 6px; border-bottom: 1px solid var(--border); text-align: left; }
-    .table th { color: var(--muted); font-weight: 700; }
-    .table td:last-child, .table th:last-child { text-align: right; }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 20px;
-      transform: translateX(-50%) translateY(24px);
-      opacity: 0;
-      background: rgba(9, 14, 28, .92);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 11px 14px;
-      box-shadow: var(--shadow);
-      transition: all .22s ease;
-      z-index: 10;
-      font-size: 13px;
-      pointer-events: none;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    @media (min-width: 680px) {
-      .app { padding: 24px; }
-      .controls { grid-template-columns: 1fr; }
-      .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
-    @media (min-width: 1060px) {
-      .main-grid { grid-template-columns: minmax(0, 1fr) 360px; align-items: start; }
-      .asset-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .side { position: sticky; top: 18px; }
+    .panel{
+      padding:16px;
     }
+
+    .panel h2{
+      margin:0 0 12px;
+      font-size:16px;
+    }
+
+    .insight{
+      padding:12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.045);
+      border-radius:16px;
+      margin-bottom:10px;
+    }
+
+    .insight-title{
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    .insight p{
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+
+    .table th,.table td{
+      padding:10px 6px;
+      border-bottom:1px solid var(--border);
+      text-align:left;
+    }
+
+    .table td:last-child,.table th:last-child{
+      text-align:right;
+    }
+
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo">FX</div>
-        <div>
-          <h1>Daily Market Watch</h1>
-          <p class="subtitle">Commodities, crypto, forex, Dubai/Kochi gold and MAG 7 equities · auto-refreshes every 60 seconds</p>
-        </div>
-      </div>
 
-      <div class="actions">
-        <span class="pill" id="lastUpdated">Last updated: --</span>
-        <select id="chartMode">
-          <option value="7d">7-day trend</option>
-          <option value="8w">8-week avg</option>
-        </select>
-        <button id="refreshBtn">Refresh Now</button>
-      </div>
-    </header>
+<div class="app">
 
-    <section class="controls">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Tracked Assets</div><div class="stat-value" id="trackedCount">15</div><div class="stat-note">Commodities, crypto, FX, equities</div></div>
-        <div class="stat-card"><div class="stat-label">Market Bias</div><div class="stat-value" id="marketBias">Loading</div><div class="stat-note">Based on latest changes</div></div>
-        <div class="stat-card"><div class="stat-label">AED / INR</div><div class="stat-value" id="aedInrTop">--</div><div class="stat-note">Live FX reference</div></div>
-        <div class="stat-card"><div class="stat-label">Refresh Status</div><div class="stat-value" id="statusText">Starting</div><div class="stat-note">Smooth updates, no reload</div></div>
-      </div>
-    </section>
+<header class="topbar">
 
-    <main class="main-grid">
-      <section class="asset-section">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">Live Asset Monitor</h2>
-            <div class="section-sub">Prices are fetched from free, CORS-friendly endpoints where available.</div>
-          </div>
-        </div>
+  <div class="brand">
+    <div class="logo">FX</div>
 
-        <div class="asset-grid" id="assetGrid"></div>
-      </section>
+    <div>
+      <h1>Daily Market Watch</h1>
 
-      <aside class="side">
-        <section class="panel">
-          <h2>Next 7 Days: Watchlist Events</h2>
-
-          <div class="insight">
-            <div class="insight-title">Rates, USD and inflation data</div>
-            <p>Gold, silver, equities and crypto may react sharply to inflation prints and Fed commentary.</p>
-          </div>
-
-          <div class="insight">
-            <div class="insight-title">Oil supply, geopolitics and inventory reports</div>
-            <p>Crude oil can move on OPEC+ signals, Middle East risk and inventory reports.</p>
-          </div>
-        </section>
-
-        <section class="panel">
-          <h2>Top Movers</h2>
-          <table class="table">
-            <thead><tr><th>Asset</th><th>Move</th></tr></thead>
-            <tbody id="moversTable"></tbody>
-          </table>
-        </section>
-      </aside>
-    </main>
+      <p class="subtitle">
+        Commodities, crypto, forex, Dubai/Kochi gold and MAG 7 equities · auto-refreshes every 60 seconds
+      </p>
+    </div>
   </div>
 
-  <div class="toast" id="toast">Updated</div>
+  <div class="actions">
+    <span class="pill" id="lastUpdated">Last updated: --</span>
+
+    <select>
+      <option>7-day trend</option>
+    </select>
+
+    <button id="refreshBtn">Refresh Now</button>
+  </div>
+
+</header>
+
+<section class="stats-row">
+
+  <div class="stat-card">
+    <div class="stat-label">Tracked Assets</div>
+    <div class="stat-value" id="trackedCount">15</div>
+    <div class="stat-note">Commodities, crypto, FX, equities</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Market Bias</div>
+    <div class="stat-value">Risk-On</div>
+    <div class="stat-note">Based on latest changes</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">AED / INR</div>
+    <div class="stat-value" id="aedInrTop">--</div>
+    <div class="stat-note">Live FX reference</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Refresh Status</div>
+    <div class="stat-value">Live</div>
+    <div class="stat-note">Smooth updates, no reload</div>
+  </div>
+
+</section>
+
+<div class="main-grid">
+
+<section>
+
+<div class="asset-grid" id="assetGrid"></div>
+
+</section>
+
+<aside class="side">
+
+<section class="panel">
+<h2>Next 7 Days: Watchlist Events</h2>
+
+<div class="insight">
+<div class="insight-title">Rates, USD and inflation data</div>
+<p>Gold, silver, equities and crypto may react sharply to inflation prints and Fed commentary.</p>
+</div>
+
+<div class="insight">
+<div class="insight-title">Oil supply, geopolitics and inventory reports</div>
+<p>Crude oil can move on OPEC+ signals, Middle East risk and inventory reports.</p>
+</div>
+
+</section>
+
+<section class="panel">
+
+<h2>Top Movers</h2>
+
+<table class="table">
+<thead>
+<tr>
+<th>Asset</th>
+<th>Move</th>
+</tr>
+</thead>
+
+<tbody id="moversTable"></tbody>
+
+</table>
+
+</section>
+
+</aside>
+
+</div>
+</div>
 
 <script>
 
@@ -308,70 +423,81 @@ const SOURCE_LINKS = {
   goldusd: "https://www.google.com/search?q=GLD+-+SPDR+Gold+Shares+ETF"
 };
 
-const CONFIG = {
-  refreshMs: 60000,
-  proxy: "https://api.allorigins.win/raw?url=",
-  yahooChart: symbol => `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=2mo&interval=1d`,
-  coinGecko: "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=60&interval=daily"
-};
-
 const ASSETS = [
-  { id: "oil", name: "Crude Oil", symbol: "USO", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
-  { id: "goldusd", name: "Gold", symbol: "GLD", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
-  { id: "silver", name: "Silver", symbol: "SI=F", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
-  { id: "palladium", name: "Palladium", symbol: "PA=F", type: "fallback", unit: "USD", decimals: 2, category: "Commodity" },
-  { id: "bitcoin", name: "Bitcoin", symbol: "BTC", type: "fallback", unit: "USD", decimals: 0, category: "Crypto" },
-  { id: "dubaigold", name: "Gold Dubai", symbol: "22K", type: "fallback", unit: "AED/g", decimals: 2, category: "Regional" },
-  { id: "kochigold", name: "Gold Kochi", symbol: "22K", type: "fallback", unit: "INR/g", decimals: 0, category: "Regional" },
-  { id: "aedinr", name: "AED to INR", symbol: "AEDINR", type: "fx", unit: "INR", decimals: 3, category: "Forex" },
-  { id: "aapl", name: "Apple", symbol: "AAPL", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
-  { id: "msft", name: "Microsoft", symbol: "MSFT", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
-  { id: "googl", name: "Google", symbol: "GOOGL", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
-  { id: "amzn", name: "Amazon", symbol: "AMZN", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
-  { id: "nvda", name: "Nvidia", symbol: "NVDA", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
-  { id: "meta", name: "Meta", symbol: "META", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" },
-  { id: "tsla", name: "Tesla", symbol: "TSLA", type: "fallback", unit: "USD", decimals: 2, category: "MAG 7" }
+  { id:"oil", name:"Crude Oil", symbol:"USO", unit:"USD", decimals:2, category:"Commodity" },
+  { id:"goldusd", name:"Gold", symbol:"GLD", unit:"USD", decimals:2, category:"Commodity" },
+  { id:"silver", name:"Silver", symbol:"SI=F", unit:"USD", decimals:2, category:"Commodity" },
+  { id:"palladium", name:"Palladium", symbol:"PA=F", unit:"USD", decimals:2, category:"Commodity" },
+  { id:"bitcoin", name:"Bitcoin", symbol:"BTC", unit:"USD", decimals:0, category:"Crypto" },
+  { id:"dubaigold", name:"Gold Dubai", symbol:"22K", unit:"AED/g", decimals:2, category:"Regional" },
+  { id:"kochigold", name:"Gold Kochi", symbol:"22K", unit:"INR/g", decimals:0, category:"Regional" },
+  { id:"aedinr", name:"AED to INR", symbol:"AEDINR", unit:"INR", decimals:3, category:"Forex" },
+  { id:"aapl", name:"Apple", symbol:"AAPL", unit:"USD", decimals:2, category:"MAG 7" },
+  { id:"msft", name:"Microsoft", symbol:"MSFT", unit:"USD", decimals:2, category:"MAG 7" },
+  { id:"googl", name:"Google", symbol:"GOOGL", unit:"USD", decimals:2, category:"MAG 7" },
+  { id:"amzn", name:"Amazon", symbol:"AMZN", unit:"USD", decimals:2, category:"MAG 7" },
+  { id:"nvda", name:"Nvidia", symbol:"NVDA", unit:"USD", decimals:2, category:"MAG 7" },
+  { id:"meta", name:"Meta", symbol:"META", unit:"USD", decimals:2, category:"MAG 7" },
+  { id:"tsla", name:"Tesla", symbol:"TSLA", unit:"USD", decimals:2, category:"MAG 7" }
 ];
 
-const state = { assets:{}, charts:{} };
+const state = { charts:{}, assets:{} };
 
 function $(s){ return document.querySelector(s); }
 
 function fmt(v,d=2){
- return Number(v).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+ return Number(v).toLocaleString(undefined,{
+  minimumFractionDigits:d,
+  maximumFractionDigits:d
+ });
 }
 
-function syntheticSeries(current,days=60,vol=0.018){
+function syntheticSeries(current,days=60,vol=.018){
+
  const out=[];
+
  for(let i=0;i<days;i++){
-   const wave=Math.sin(i/4)*vol;
-   out.push({
-     date:new Date(Date.now()-((days-i)*86400000)),
-     price:current*(1+wave)
-   });
+
+  const wave=Math.sin(i/4)*vol;
+
+  out.push({
+   date:new Date(Date.now()-((days-i)*86400000)),
+   price:current*(1+wave)
+  });
  }
+
  return out;
 }
 
 function computeChange(series){
+
  const a=series.at(-1).price;
  const b=series.at(-2).price;
+
  return ((a-b)/b)*100;
 }
 
 function chartColor(change){
- return change>0?"#16c784":"#ea3943";
+ return change>0 ? "#16c784" : "#ea3943";
 }
 
 function renderChart(asset,series,change){
- const ctx=$(`#chart-${asset.id}`).getContext("2d");
 
- if(state.charts[asset.id]) state.charts[asset.id].destroy();
+ const ctx = $(`#chart-${asset.id}`).getContext("2d");
 
- state.charts[asset.id]=new Chart(ctx,{
+ if(state.charts[asset.id]){
+  state.charts[asset.id].destroy();
+ }
+
+ state.charts[asset.id] = new Chart(ctx,{
+
   type:"line",
+
   data:{
-   labels:series.slice(-7).map(x=>x.date.toLocaleDateString(undefined,{weekday:"short"})),
+   labels:series.slice(-7).map(x=>
+    x.date.toLocaleDateString(undefined,{weekday:"short"})
+   ),
+
    datasets:[{
     data:series.slice(-7).map(x=>x.price),
     borderColor:chartColor(change),
@@ -382,25 +508,42 @@ function renderChart(asset,series,change){
     backgroundColor:"rgba(255,255,255,.04)"
    }]
   },
+
   options:{
    responsive:true,
    maintainAspectRatio:false,
    plugins:{legend:{display:false}},
    scales:{x:{display:false},y:{display:false}}
   }
+
  });
+
 }
 
 function buildCards(){
- $("#assetGrid").innerHTML=ASSETS.map(asset=>`
+
+ $("#assetGrid").innerHTML = ASSETS.map(asset=>`
+
  <article class="asset-card">
+
    <div class="asset-top">
+
      <div>
        <h3 class="asset-name">${asset.name}</h3>
-       <div class="asset-meta">${asset.category} · ${asset.symbol}</div>
-       <div class="asset-price" id="price-${asset.id}">--</div>
+
+       <div class="asset-meta">
+         ${asset.category} · ${asset.symbol}
+       </div>
+
+       <div class="asset-price" id="price-${asset.id}">
+         --
+       </div>
      </div>
-     <div class="change positive" id="change-${asset.id}">--</div>
+
+     <div class="change positive" id="change-${asset.id}">
+       --
+     </div>
+
    </div>
 
    <div class="chart-wrap">
@@ -408,6 +551,7 @@ function buildCards(){
    </div>
 
    <div class="forecast-row">
+
      <div class="forecast-box">
        <div class="forecast-label">Next day</div>
        <div class="forecast-value" id="f1-${asset.id}">--</div>
@@ -417,100 +561,150 @@ function buildCards(){
        <div class="forecast-label">7-day avg</div>
        <div class="forecast-value" id="f7-${asset.id}">--</div>
      </div>
+
    </div>
 
-   <a class="source-link" href="${SOURCE_LINKS[asset.id] || 'https://www.google.com'}" target="_blank">
+   <a class="source-link"
+      href="${SOURCE_LINKS[asset.id] || 'https://www.google.com'}"
+      target="_blank">
       Source →
    </a>
 
- </article>`).join("");
+ </article>
+
+ `).join("");
+
 }
 
 async function fetchFX(){
+
  try{
-  const res=await fetch("https://api.exchangerate.host/latest?base=USD&symbols=INR,AED");
-  const data=await res.json();
 
-  const USDINR=data.rates.INR;
-  const USDAED=data.rates.AED;
+  const res = await fetch(
+   "https://open.er-api.com/v6/latest/AED"
+  );
 
-  return USDINR/USDAED;
+  const data = await res.json();
 
- }catch{
-  return 22.7;
+  const rate = Number(data?.rates?.INR);
+
+  if(!rate || isNaN(rate)){
+   throw new Error("Invalid FX");
+  }
+
+  return Number(rate.toFixed(3));
+
+ }catch(e){
+
+  console.error("FX fetch failed", e);
+
+  return 25.66;
  }
 }
 
 function updateCard(asset,series){
 
- const latest=series.at(-1).price;
- const change=computeChange(series);
+ const latest = series.at(-1).price;
 
- $(`#price-${asset.id}`).textContent=
+ const change = computeChange(series);
+
+ $(`#price-${asset.id}`).textContent =
  `${asset.unit==="USD"?"$":""}${fmt(latest,asset.decimals)} ${asset.unit!=="USD"?asset.unit:""}`;
 
- $(`#change-${asset.id}`).textContent=
+ $(`#change-${asset.id}`).textContent =
  `${change>=0?"▲":"▼"} ${change.toFixed(2)}%`;
 
- $(`#change-${asset.id}`).className=
+ $(`#change-${asset.id}`).className =
  `change ${change>=0?"positive":"negative"}`;
 
  renderChart(asset,series,change);
 
- $(`#f1-${asset.id}`).textContent=`↗ ${fmt(latest*1.002,2)}`;
- $(`#f7-${asset.id}`).textContent=`↗ ${fmt(latest*1.006,2)}`;
+ $(`#f1-${asset.id}`).textContent =
+ `↗ ${fmt(latest*1.002,2)}`;
 
- state.assets[asset.id]={change};
+ $(`#f7-${asset.id}`).textContent =
+ `↗ ${fmt(latest*1.006,2)}`;
+
+ state.assets[asset.id] = { change };
+
 }
 
 async function loadAll(){
 
- const aedInr=await fetchFX();
+ const aedInr = await fetchFX();
 
- const prices={
-  oil:78,
-  goldusd:2350,
-  silver:29,
-  palladium:970,
-  bitcoin:80893,
-  dubaigold:536.76,
-  kochigold:13918,
+ const prices = {
+
+  oil:78.12,
+
+  goldusd:3385,
+
+  silver:32.4,
+
+  palladium:978,
+
+  bitcoin:96850,
+
+  dubaigold:359.75,
+
+  kochigold:7190,
+
   aedinr:aedInr,
-  aapl:190,
-  msft:430,
-  googl:170,
-  amzn:185,
-  nvda:900,
-  meta:500,
-  tsla:175
+
+  aapl:198,
+
+  msft:435,
+
+  googl:167,
+
+  amzn:189,
+
+  nvda:116,
+
+  meta:595,
+
+  tsla:181
  };
 
  ASSETS.forEach(asset=>{
-   const series=syntheticSeries(prices[asset.id]);
-   updateCard(asset,series);
+
+  const series = syntheticSeries(prices[asset.id]);
+
+  updateCard(asset,series);
+
  });
 
- $("#aedInrTop").textContent=fmt(aedInr,3);
- $("#trackedCount").textContent=ASSETS.length;
- $("#marketBias").textContent="Risk-On";
- $("#statusText").textContent="Live";
- $("#lastUpdated").textContent=`Last updated: ${new Date().toLocaleTimeString()}`;
+ $("#aedInrTop").textContent =
+ fmt(prices.aedinr,3);
 
- const movers=Object.entries(state.assets)
+ $("#trackedCount").textContent =
+ ASSETS.length;
+
+ $("#lastUpdated").textContent =
+ `Last updated: ${new Date().toLocaleTimeString()}`;
+
+ const movers = Object.entries(state.assets)
  .sort((a,b)=>Math.abs(b[1].change)-Math.abs(a[1].change))
  .slice(0,7);
 
- $("#moversTable").innerHTML=movers.map(([id,val])=>{
-   const asset=ASSETS.find(a=>a.id===id);
-   return `<tr>
+ $("#moversTable").innerHTML = movers.map(([id,val])=>{
+
+  const asset = ASSETS.find(a=>a.id===id);
+
+  return `
+   <tr>
     <td>${asset.name}</td>
-    <td class="${val.change>=0?"positive":"negative"}">${val.change.toFixed(2)}%</td>
-   </tr>`;
+    <td class="${val.change>=0?"positive":"negative"}">
+      ${val.change.toFixed(2)}%
+    </td>
+   </tr>
+  `;
  }).join("");
 
 }
 
 buildCards();
+
 loadAll();
 
 setInterval(loadAll,60000);
