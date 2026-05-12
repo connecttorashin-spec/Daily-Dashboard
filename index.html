@@ -760,23 +760,31 @@ function fmt(v,d=2){
 
 }
 
-function syntheticSeries(current,days=60,vol=.018){
+function syntheticSeries(current, days = 60, vol = .018, seed = 1){
 
-  const out=[];
+  const out = [];
 
-  for(let i=0;i<days;i++){
+  for(let i = 0; i < days; i++){
 
-    const wave=Math.sin(i/4)*vol;
+    const uniqueWave =
+      Math.sin((i + seed) / (3.5 + seed % 5)) * vol +
+      Math.cos((i + seed) / (6 + seed % 7)) * vol * 0.6;
+
+    const microMove =
+      Math.sin((i * seed) / 11) * vol * 0.35;
 
     out.push({
-      date:new Date(Date.now()-((days-i)*86400000)),
-      price:current*(1+wave)
+      date: new Date(Date.now() - ((days - i) * 86400000)),
+      price: current * (1 + uniqueWave + microMove)
     });
 
   }
 
+  out[out.length - 1].price = current;
+
   return out;
 }
+
 
 function computeChange(series){
 
@@ -1028,10 +1036,13 @@ async function loadAll(){
 
   ASSETS.forEach(asset=>{
 
-    const series =
-    syntheticSeries(
-      prices[asset.id]
-    );
+const series =
+syntheticSeries(
+  prices[asset.id],
+  60,
+  asset.id === "aedinr" ? 0.004 : 0.018,
+  asset.id.split("").reduce((a,c)=>a+c.charCodeAt(0),0)
+);
 
     updateCard(asset,series);
 
